@@ -3,16 +3,19 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <unistd.h>
+#include <random>
 using namespace std;
-int intRand(const int & min, const int & max) {
-    static  mt19937 generator;
-    uniform_int_distribution<int> distribution(min,max);
-    return distribution(generator);
+
+double Rand(const uint64_t & min, const uint64_t & max) {
+    static mt19937 generator;
+    uniform_int_distribution<uint64_t> distribution(min,max);
+    return (double)distribution(generator)/((double)max/2) - 1;
 }
 
 void *msg(void* n){
     int times = *((int*)n);
-    printf("%d", intRand(0, 100));
+    while(1)
+        printf("%.20lf\n", Rand(0, numeric_limits<uint64_t>::max()));
 }
 
 int main(int argc, char** argv){

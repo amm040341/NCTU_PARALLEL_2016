@@ -1,3 +1,3 @@
 all:
-	g++ pi.cpp -lpthread
-	./a.out 100
+	g++ -pthread -std=c++11 -O2 -s pi.cpp -o pi
+	./pi 100
