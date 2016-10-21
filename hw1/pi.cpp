@@ -8,17 +8,18 @@ using namespace std;
 #define MAX numeric_limits<uint64_t>::max() 
 #define MIN numeric_limits<uint64_t>::min() 
 #define SQUARE_DIS(x,y) x*x+y*y
-#define CORE 1
+//#define CORE 8
 
 void *msg(void* n){
     long times = (long)n;
     printf("times: %ld\n", times);
-    static mt19937 generator;
+    printf("pid: %d\n", (int)pthread_self());
+    mt19937 generator(time(0)+(int)pthread_self());
     uniform_int_distribution<uint64_t> distribution(MIN, MAX);
     long dart_cnt = 0;
     for(int i=0; i< times; i++){
-        long double x = (long double)distribution(generator)/((long double)MAX/2) - 1;
-        long double y = (long double)distribution(generator)/((long double)MAX/2) - 1;
+        long double x = distribution(generator)/((long double)MAX/2) - 1;
+        long double y = distribution(generator)/((long double)MAX/2) - 1;
         if(SQUARE_DIS(x, y) <= 1){
             dart_cnt++;
         }
@@ -27,8 +28,8 @@ void *msg(void* n){
 }
 
 int main(int argc, char** argv){
-    int core =sysconf(_SC_NPROCESSORS_ONLN); 
-    printf("core: %d\n", core);
+    int CORE = sysconf(_SC_NPROCESSORS_ONLN);
+    printf("core: %d\n", CORE);
     cout << "cnt:" << argv[1] << endl;
     long cnt = atoi(argv[1]);
     pthread_t threads[CORE];   
@@ -49,7 +50,7 @@ int main(int argc, char** argv){
     }
 
     printf("sum: %ld\n", sum);
-    double estimate_pi = 4*(double)sum/(double)cnt;
+    double estimate_pi = 4*sum/(double)cnt;
     printf("pi: %.8lf\n", estimate_pi);
 }
 
