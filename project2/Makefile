@@ -1,7 +1,7 @@
 SHELL=/bin/sh
 BENCHMARK=cg
 BENCHMARKU=CG
-PROGRAMNAME=cg
+PROGRAMNAME=cgtest
 DATASIZE=MEDIUMN
 
 include make.common
@@ -17,7 +17,7 @@ ${PROGRAM}: config ${OBJS}
 .c.o:
 	${CCOMPILE} $< -D${DATASIZE}
 
-cg.o:		cg.c  globals.h
+cg.o:		cgtest.c  globals.h
 
 clean:
 	- rm -f *.o *~
