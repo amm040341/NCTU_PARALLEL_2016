@@ -310,7 +310,7 @@ static void conj_grad(int colidx[],
   //---------------------------------------------------------------------
   //memset(q, 0.0, sizeof(q));
   //memset(z, 0, sizeof(z));
-  #pragma omp parallel for num_threads(8) schedule(static)
+  #pragma omp parallel for schedule(static)
   for (int j = 0; j < naa+1; j++) {
     q[j] = 0.0;
     z[j] = 0.0;
@@ -322,7 +322,7 @@ static void conj_grad(int colidx[],
   // rho = r.r
   // Now, obtain the norm of r: First, sum squares of r elements locally...
   //---------------------------------------------------------------------
-  //#pragma omp parallel for num_threads(8) schedule(static)
+  #pragma omp parallel for schedule(static) reduction(+:rho)
   for (int j = 0; j < lastcol - firstcol + 1; j++) {
     rho = rho + r[j]*r[j];
   }
@@ -361,6 +361,7 @@ static void conj_grad(int colidx[],
     // Obtain p.q
     //---------------------------------------------------------------------
     d = 0.0;
+    #pragma omp parallel for reduction(+:d)
     for (int j = 0; j < lastcol - firstcol + 1; j++) {
       d = d + p[j]*q[j];
     }
