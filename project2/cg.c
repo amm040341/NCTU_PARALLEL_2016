@@ -389,24 +389,18 @@ static void conj_grad(int colidx[],
     // and    r = r - alpha*q
     //---------------------------------------------------------------------
     rho = 0.0;
-#pragma omp parallel
-{
-    #pragma omp for
     for (j = 0; j < lastcol - firstcol + 1; j++) {
       z[j] = z[j] + alpha*p[j];  
       r[j] = r[j] - alpha*q[j];
     }
             
-    #pragma omp barrier
     //---------------------------------------------------------------------
     // rho = r.r
     // Now, obtain the norm of r: First, sum squares of r elements locally...
     //---------------------------------------------------------------------
-    #pragma omp for reduction(+:rho)
     for (j = 0; j < lastcol - firstcol + 1; j++) {
       rho = rho + r[j]*r[j];
     }
-    #pragma omp barrier
     //---------------------------------------------------------------------
     // Obtain beta:
     //---------------------------------------------------------------------
@@ -415,11 +409,9 @@ static void conj_grad(int colidx[],
     //---------------------------------------------------------------------
     // p = r + beta*p
     //---------------------------------------------------------------------
-    #pragma omp for
     for (j = 0; j < lastcol - firstcol + 1; j++) {
       p[j] = r[j] + beta*p[j];
     }
-} 
 } // end of do cgit=1,cgitmax
 
   //---------------------------------------------------------------------
