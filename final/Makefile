@@ -1,15 +1,19 @@
-objects = music.m4a
+objects = music
+NAMEEXT = m4a
 
 all:
-	g++-6 co1.cpp -o co1 -fopenmp  
+	g++ co1.cpp -o co1 -fopenmp  
 
 origin:
-	g++-6 -fopenmp co_origin.cpp -o origin
+	g++ co_origin.cpp -o origin
 
 pararun:
-	time ./co1 e $(objects) paraEncrypt
-	time ./co1 d paraEncrypt paraDectypt.m4a key
+	./co1 e $(objects).$(NAMEEXT) paraEncrypt
+	./co1 d paraEncrypt paraDectypt.$(NAMEEXT) key
 
 originrun:
-	time ./origin e $(objects) originEncrypt
-	time ./origin d originEncrypt originDectypt.m4a key
+	./origin e $(objects).$(NAMEEXT) originEncrypt
+	./origin d originEncrypt originDectypt.$(NAMEEXT) key
+
+clean: 
+	rm -rf originDectypt* originEncrypt* paraDectypt* paraEncrypt* key

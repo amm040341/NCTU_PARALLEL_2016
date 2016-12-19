@@ -45,7 +45,7 @@ void AES_SubBytes(BYTE state[], BYTE sbox[]) {
     state[i] = sbox[state[i]];
 }
  
-void AES_AddRoundKey(BYTE state[], BYTE rkey[]) {
+void AES_AddRoundKey(BYTE state[], BYTE rkey[], int u) {
   int i;
   for(i = 0; i < 16; i++)
     state[i] ^= rkey[i];
@@ -148,33 +148,33 @@ int AES_ExpandKey(BYTE key[], int keyLen) {
 }
  
 // AES_Encrypt: encrypt the 16 byte array 'block' with the previously expanded key 'key'.
-void AES_Encrypt(BYTE block[], BYTE key[], int keyLen) {
+void AES_Encrypt(BYTE block[], BYTE key[], int keyLen, int u) {
   int l = keyLen, i;
-  AES_AddRoundKey(block, &key[0]);
+  AES_AddRoundKey(block, &key[0], u);
   for(i = 16; i < l - 16; i += 16) {
     AES_SubBytes(block, AES_Sbox);
     AES_ShiftRows(block, AES_ShiftRowTab);
     AES_MixColumns(block);
-    AES_AddRoundKey(block, &key[i]);
+    AES_AddRoundKey(block, &key[i], u);
   }
   AES_SubBytes(block, AES_Sbox);
   AES_ShiftRows(block, AES_ShiftRowTab);
-  AES_AddRoundKey(block, &key[i]);
+  AES_AddRoundKey(block, &key[i], u);
 }
  
 // AES_Decrypt: decrypt the 16 byte array 'block' with the previously expanded key 'key'.
 void AES_Decrypt(BYTE block[], BYTE key[], int keyLen) {
   int l = keyLen, i;
-  AES_AddRoundKey(block, &key[l - 16]);
+  AES_AddRoundKey(block, &key[l - 16], 0);
   AES_ShiftRows(block, AES_ShiftRowTab_Inv);
   AES_SubBytes(block, AES_Sbox_Inv);
   for(i = l - 32; i >= 16; i -= 16) {
-    AES_AddRoundKey(block, &key[i]);
+    AES_AddRoundKey(block, &key[i], 0);
     AES_MixColumns_Inv(block);
     AES_ShiftRows(block, AES_ShiftRowTab_Inv);
     AES_SubBytes(block, AES_Sbox_Inv);
   }
-  AES_AddRoundKey(block, &key[0]);
+  AES_AddRoundKey(block, &key[0], 0);
 }
  
 // ===================== test ============================================
@@ -186,7 +186,6 @@ int main(int argc,char *argv[])
 	AES_Init();
     //cout<< "hello world";
 
-    int expandKeyLen = AES_ExpandKey(key, keyLen);
 	if (argv[1][0]=='e'&&argc==4)
 	{
 		
@@ -194,8 +193,10 @@ int main(int argc,char *argv[])
 	    srand(time(NULL));
         for(i = 0; i < keyLen; i++){
             key[i] = rand()%58 + 'A';
+            //key[i] = 'A';
             keyfile << key[i];
         }
+        int expandKeyLen = AES_ExpandKey(key, keyLen);
 		ifstream file(argv[2],ios::binary | ios::in);
 		ostringstream oss;
 		int len;
@@ -212,10 +213,11 @@ int main(int argc,char *argv[])
 		int time=blockLen/16+1;
 		if (blockLen%16==0)time--;
 				cout<<time<<endl;
-		#pragma omp parallel for
+
+        #pragma omp parallel for
 		for(int u=0;u<time;u++)
 		{
-			int t=u*16;
+		    int t=u*16;
 	
 			//printf("u%d:%d\n",omp_get_thread_num(),u);
 		    BYTE t_block[16];
@@ -223,11 +225,14 @@ int main(int argc,char *argv[])
 		    {
 			    if(t+j>blockLen)
 				    t_block[j]=0;
-			    else
+			    else{
                     t_block[j]=data[t+j];
+                }
             }
-		    AES_Encrypt(t_block, key, expandKeyLen);
-			for (int j=0;j<16;j++)data[t+j]=t_block[j];
+		    AES_Encrypt(t_block, key, expandKeyLen, u);
+			for (int j=0;j<16;j++){
+                data[t+j]=t_block[j];
+            }
 		}
 		for (int j=0;j<blockLen;j++)
 		{
@@ -251,6 +256,7 @@ int main(int argc,char *argv[])
         for(i = 0; i < keyLen; i++){
             key[i] = keybuf[i];
         }
+        int expandKeyLen = AES_ExpandKey(key, keyLen);
 		ifstream file(argv[2],ios::binary | ios::in);
 		ostringstream oss;
 		int len;
