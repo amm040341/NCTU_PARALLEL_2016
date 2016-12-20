@@ -185,7 +185,7 @@ int main(int argc,char *argv[])
 	int keyLen = 32, maxKeyLen=16 * (14 + 1);
 	AES_Init();
     //cout<< "hello world";
-
+    cout << endl;
 	if (argv[1][0]=='e'&&argc==4)
 	{
 		
@@ -209,10 +209,10 @@ int main(int argc,char *argv[])
 		string data2 = "";
 		file.close();
 		ofstream ofile(argv[3], ios::out);
-		cout<<data.size()<<endl;
+		//cout<<data.size()<<endl;
 		int time=blockLen/16+1;
-		if (blockLen%16==0)time--;
-				cout<<time<<endl;
+		/*if (blockLen%16==0)time--;
+				cout<<time<<endl;*/
 
         #pragma omp parallel for
 		for(int u=0;u<time;u++)
@@ -269,9 +269,9 @@ int main(int argc,char *argv[])
 		string data2 = "";
 		file.close();
 		ofstream ofile(argv[3], ios::out);
-		cout<<data.size()<<endl;
+		//cout<<data.size()<<endl;
 		int time=blockLen/16;
-		cout<<time<<endl;
+		//cout<<time<<endl;
 		#pragma omp parallel for
 		for(int u=0;u<time;u++)
 		{

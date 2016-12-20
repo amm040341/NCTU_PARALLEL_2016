@@ -210,8 +210,8 @@ int main(int argc,char *argv[])
 		string data2 = "";
 		file.close();
 		ofstream ofile(argv[3], ios::out);
-		cout<<data.size()<<endl;
-		printf("ini e ");
+		//cout<<data.size()<<endl;
+		//printf("ini e ");
 		while(now_poi<blockLen)
 		{
 		    BYTE t_block[16];
@@ -258,7 +258,7 @@ int main(int argc,char *argv[])
 		string data2 = "";
 		file.close();
 		ofstream ofile(argv[3], ios::out);
-		cout<<data.size()<<endl;
+		//cout<<data.size()<<endl;
 		while(now_poi<blockLen)
 	   {
 			BYTE t_block[16];
